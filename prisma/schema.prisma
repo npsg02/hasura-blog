@@ -1,0 +1,117 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Users table
+model User {
+  id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email         String    @unique @db.VarChar(255)
+  name          String?   @db.VarChar(255)
+  passwordHash  String?   @map("password_hash") @db.VarChar(255)
+  avatarUrl     String?   @map("avatar_url") @db.Text
+  bio           String?   @db.Text
+  role          String    @default("user") @db.VarChar(50)
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt     DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  
+  posts         Post[]
+  comments      Comment[]
+  
+  @@map("users")
+}
+
+// Categories table
+model Category {
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name        String    @unique @db.VarChar(100)
+  slug        String    @unique @db.VarChar(100)
+  description String?   @db.Text
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  
+  posts       Post[]
+  
+  @@map("categories")
+}
+
+// Posts table
+model Post {
+  id             String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  title          String    @db.VarChar(255)
+  slug           String    @unique @db.VarChar(255)
+  excerpt        String?   @db.Text
+  content        String    @db.Text
+  featuredImage  String?   @map("featured_image") @db.Text
+  authorId       String    @map("author_id") @db.Uuid
+  categoryId     String?   @map("category_id") @db.Uuid
+  status         String    @default("draft") @db.VarChar(20)
+  publishedAt    DateTime? @map("published_at") @db.Timestamptz(6)
+  createdAt      DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt      DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  
+  author         User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  category       Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  comments       Comment[]
+  postTags       PostTag[]
+  
+  @@index([authorId], name: "idx_posts_author_id")
+  @@index([categoryId], name: "idx_posts_category_id")
+  @@index([status], name: "idx_posts_status")
+  @@index([publishedAt], name: "idx_posts_published_at")
+  @@map("posts")
+}
+
+// Comments table
+model Comment {
+  id        String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  content   String    @db.Text
+  postId    String    @map("post_id") @db.Uuid
+  authorId  String    @map("author_id") @db.Uuid
+  parentId  String?   @map("parent_id") @db.Uuid
+  status    String    @default("pending") @db.VarChar(20)
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  
+  post      Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
+  author    User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  parent    Comment?  @relation("CommentToComment", fields: [parentId], references: [id], onDelete: Cascade)
+  replies   Comment[] @relation("CommentToComment")
+  
+  @@index([postId], name: "idx_comments_post_id")
+  @@index([authorId], name: "idx_comments_author_id")
+  @@index([parentId], name: "idx_comments_parent_id")
+  @@map("comments")
+}
+
+// Tags table
+model Tag {
+  id        String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name      String    @unique @db.VarChar(100)
+  slug      String    @unique @db.VarChar(100)
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  
+  postTags  PostTag[]
+  
+  @@map("tags")
+}
+
+// PostTags junction table
+model PostTag {
+  postId String @map("post_id") @db.Uuid
+  tagId  String @map("tag_id") @db.Uuid
+  
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  tag    Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  
+  @@id([postId, tagId])
+  @@map("post_tags")
+}
