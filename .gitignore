@@ -38,3 +38,10 @@ next-env.d.ts
 
 # hasura
 hasura/metadata/.hasura-metadata-lock
+
+# prisma
+/lib/generated/prisma
+
+# nix
+.direnv
+result

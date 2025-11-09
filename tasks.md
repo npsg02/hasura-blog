@@ -52,6 +52,20 @@ This document outlines the implementation plan for setting up a Next.js blog wit
 - [x] Create initial migration files
 - [x] Setup seed data with sample posts and users
 
+### 2.4 Prisma Integration
+- [x] Install Prisma and Prisma Client
+- [x] Create Prisma schema matching Hasura migrations
+- [x] Configure Prisma for PostgreSQL
+- [x] Add Prisma scripts to package.json:
+  - `npm run prisma:generate` - Generate Prisma Client
+  - `npm run prisma:studio` - Open Prisma Studio
+  - `npm run prisma:db:push` - Push schema to database
+  - `npm run prisma:db:pull` - Pull schema from database
+  - `npm run prisma:migrate:dev` - Create and apply migrations (dev)
+  - `npm run prisma:migrate:deploy` - Apply migrations (production)
+  - `npm run prisma:migrate:reset` - Reset database
+- [x] Add DATABASE_URL to .env.example
+
 ## ✅ Phase 3: GraphQL Integration (COMPLETED)
 
 ### 3.1 Apollo Client Setup
@@ -144,6 +158,17 @@ This document outlines the implementation plan for setting up a Next.js blog wit
 - [x] Document API structure
 - [x] Create setup script (setup.sh)
 
+### 8.3 Nix Development Environment
+- [x] Create flake.nix for reproducible builds
+- [x] Create shell.nix for legacy Nix support
+- [x] Add .envrc for direnv integration
+- [x] Configure development tools:
+  - Node.js 20
+  - Docker and Docker Compose
+  - Hasura CLI
+  - PostgreSQL 15 client
+  - Git and other utilities
+
 ## ✅ Phase 9: Testing and Deployment (BASIC SETUP COMPLETED)
 
 ### 9.1 Testing
@@ -176,6 +201,8 @@ This document outlines the implementation plan for setting up a Next.js blog wit
 11. ✅ SEO metadata configuration
 12. ✅ Comprehensive documentation
 13. ✅ Setup automation script
+14. ✅ Prisma ORM integration for migrations
+15. ✅ Nix development environment (flake.nix and shell.nix)
 
 ### What's Pending:
 1. ⏳ Blog UI components (posts list, detail pages)

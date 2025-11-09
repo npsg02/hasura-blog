@@ -14,7 +14,9 @@ A modern blog application built with Next.js 14, Hasura GraphQL Engine, Tailwind
 - ✅ **NextAuth.js** for authentication
 - ✅ **Redux Toolkit** for state management
 - ✅ **TypeScript** for type safety
-- ✅ **Database Migrations** with Hasura
+- ✅ **Database Migrations** with Hasura and Prisma
+- ✅ **Prisma ORM** for type-safe database access
+- ✅ **Nix** for reproducible development environment
 - ✅ **SEO Optimization** with Next.js metadata API
 
 ## Architecture
@@ -43,11 +45,78 @@ hasura-blog/
 
 ## Prerequisites
 
+### Option 1: Using Nix (Recommended)
+- Nix package manager with flakes enabled
+
+### Option 2: Manual Setup
 - Docker and Docker Compose
 - Node.js 20+ (for local development)
 - npm or yarn
 
 ## Quick Start
+
+### Option A: Using Nix (Recommended for reproducible builds)
+
+#### 1. Install Nix with flakes enabled
+
+If you don't have Nix installed:
+
+```bash
+# Install Nix
+curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install
+
+# Or use the official installer
+sh <(curl -L https://nixos.org/nix/install) --daemon
+```
+
+Enable flakes in your Nix configuration if not already enabled:
+
+```bash
+mkdir -p ~/.config/nix
+echo "experimental-features = nix-command flakes" >> ~/.config/nix/nix.conf
+```
+
+#### 2. Enter the development environment
+
+```bash
+# Clone the repository
+git clone https://github.com/npsg02/hasura-blog.git
+cd hasura-blog
+
+# Enter Nix shell (this will download and setup all dependencies)
+nix develop
+
+# Or use direnv (recommended)
+# Install direnv first: nix-env -iA nixpkgs.direnv
+echo "use flake" > .envrc
+direnv allow
+```
+
+#### 3. Set up environment variables
+
+```bash
+cp .env.example .env
+```
+
+Edit `.env` and update the values as needed. The default values work for local development.
+
+#### 4. Start development
+
+```bash
+# Start Docker services
+docker-compose -f docker-compose.dev.yml up -d
+
+# Install npm dependencies
+npm install
+
+# Generate Prisma Client
+npm run prisma:generate
+
+# Start Next.js development server
+npm run dev
+```
+
+### Option B: Manual Setup
 
 ### 1. Clone the repository
 
@@ -216,6 +285,58 @@ Redux Toolkit is configured with two slices:
 - `npm run lint` - Run ESLint
 - `npm run codegen` - Generate GraphQL types
 
+## Prisma Commands
+
+Prisma is integrated as an alternative migration tool and ORM. You can use it alongside Hasura:
+
+### Generate Prisma Client
+
+```bash
+npm run prisma:generate
+```
+
+### Database Management
+
+```bash
+# Push schema changes to database (without migrations)
+npm run prisma:db:push
+
+# Pull schema from database to Prisma schema
+npm run prisma:db:pull
+
+# Open Prisma Studio (database GUI)
+npm run prisma:studio
+```
+
+### Migrations with Prisma
+
+```bash
+# Create and apply a new migration in development
+npm run prisma:migrate:dev
+
+# Apply migrations in production
+npm run prisma:migrate:deploy
+
+# Reset database (WARNING: This will delete all data)
+npm run prisma:migrate:reset
+```
+
+### Using Prisma Client in your code
+
+The Prisma Client is generated in `lib/generated/prisma` and can be imported:
+
+```typescript
+import { PrismaClient } from '@/lib/generated/prisma';
+
+const prisma = new PrismaClient();
+
+// Example: Get all published posts
+const posts = await prisma.post.findMany({
+  where: { status: 'published' },
+  include: { author: true, category: true }
+});
+```
+
 ## Hasura CLI Commands
 
 Install Hasura CLI:
@@ -223,6 +344,8 @@ Install Hasura CLI:
 ```bash
 curl -L https://github.com/hasura/graphql-engine/raw/stable/cli/get.sh | bash
 ```
+
+Or if using Nix, it's already installed in the development environment.
 
 Create a new migration:
 
