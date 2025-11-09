@@ -413,18 +413,28 @@ Configure role-based permissions in Hasura Console:
 
 This project is licensed under the ISC License.
 
+## Additional Documentation
+
+- [PRISMA.md](./PRISMA.md) - Detailed Prisma integration guide
+- [NIX.md](./NIX.md) - Nix development environment guide
+- [DEPLOYMENT.md](./DEPLOYMENT.md) - Production deployment guide
+- [CONTRIBUTING.md](./CONTRIBUTING.md) - Contribution guidelines
+
 ## Support
 
 For issues and questions:
 - Open an issue on GitHub
 - Check Hasura documentation: https://hasura.io/docs
 - Check Next.js documentation: https://nextjs.org/docs
+- Check Prisma documentation: https://www.prisma.io/docs
 
 ## Acknowledgments
 
 - [Next.js](https://nextjs.org/)
 - [Hasura](https://hasura.io/)
+- [Prisma](https://www.prisma.io/)
 - [TailwindCSS](https://tailwindcss.com/)
 - [Apollo Client](https://www.apollographql.com/docs/react/)
 - [NextAuth.js](https://next-auth.js.org/)
 - [Redux Toolkit](https://redux-toolkit.js.org/)
+- [Nix](https://nixos.org/)
