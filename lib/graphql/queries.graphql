@@ -1,0 +1,124 @@
+query GetPosts($limit: Int = 10, $offset: Int = 0) {
+  posts(
+    limit: $limit
+    offset: $offset
+    order_by: { published_at: desc }
+    where: { status: { _eq: "published" } }
+  ) {
+    id
+    title
+    slug
+    excerpt
+    featured_image
+    published_at
+    author {
+      id
+      name
+      avatar_url
+    }
+    category {
+      id
+      name
+      slug
+    }
+    post_tags {
+      tag {
+        id
+        name
+        slug
+      }
+    }
+  }
+}
+
+query GetPostBySlug($slug: String!) {
+  posts(where: { slug: { _eq: $slug } }) {
+    id
+    title
+    slug
+    excerpt
+    content
+    featured_image
+    published_at
+    created_at
+    updated_at
+    author {
+      id
+      name
+      bio
+      avatar_url
+    }
+    category {
+      id
+      name
+      slug
+      description
+    }
+    post_tags {
+      tag {
+        id
+        name
+        slug
+      }
+    }
+    comments(where: { status: { _eq: "approved" } }, order_by: { created_at: asc }) {
+      id
+      content
+      created_at
+      author {
+        id
+        name
+        avatar_url
+      }
+    }
+  }
+}
+
+query GetCategories {
+  categories {
+    id
+    name
+    slug
+    description
+  }
+}
+
+query GetPostsByCategory($categorySlug: String!, $limit: Int = 10) {
+  posts(
+    where: {
+      category: { slug: { _eq: $categorySlug } }
+      status: { _eq: "published" }
+    }
+    limit: $limit
+    order_by: { published_at: desc }
+  ) {
+    id
+    title
+    slug
+    excerpt
+    featured_image
+    published_at
+    author {
+      id
+      name
+      avatar_url
+    }
+    category {
+      id
+      name
+      slug
+    }
+  }
+}
+
+query GetUser($id: uuid!) {
+  users_by_pk(id: $id) {
+    id
+    email
+    name
+    bio
+    avatar_url
+    role
+    created_at
+  }
+}

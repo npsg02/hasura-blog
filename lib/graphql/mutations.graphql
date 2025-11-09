@@ -1,0 +1,85 @@
+mutation CreatePost(
+  $title: String!
+  $slug: String!
+  $excerpt: String
+  $content: String!
+  $author_id: uuid!
+  $category_id: uuid
+  $status: String = "draft"
+) {
+  insert_posts_one(
+    object: {
+      title: $title
+      slug: $slug
+      excerpt: $excerpt
+      content: $content
+      author_id: $author_id
+      category_id: $category_id
+      status: $status
+    }
+  ) {
+    id
+    title
+    slug
+    created_at
+  }
+}
+
+mutation UpdatePost(
+  $id: uuid!
+  $title: String
+  $content: String
+  $excerpt: String
+  $status: String
+  $published_at: timestamptz
+) {
+  update_posts_by_pk(
+    pk_columns: { id: $id }
+    _set: {
+      title: $title
+      content: $content
+      excerpt: $excerpt
+      status: $status
+      published_at: $published_at
+    }
+  ) {
+    id
+    title
+    slug
+    updated_at
+  }
+}
+
+mutation DeletePost($id: uuid!) {
+  delete_posts_by_pk(id: $id) {
+    id
+  }
+}
+
+mutation CreateComment($content: String!, $post_id: uuid!, $author_id: uuid!) {
+  insert_comments_one(
+    object: { content: $content, post_id: $post_id, author_id: $author_id }
+  ) {
+    id
+    content
+    created_at
+  }
+}
+
+mutation UpdateUser(
+  $id: uuid!
+  $name: String
+  $bio: String
+  $avatar_url: String
+) {
+  update_users_by_pk(
+    pk_columns: { id: $id }
+    _set: { name: $name, bio: $bio, avatar_url: $avatar_url }
+  ) {
+    id
+    name
+    bio
+    avatar_url
+    updated_at
+  }
+}
