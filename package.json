@@ -15,7 +15,9 @@
     "prisma:db:pull": "prisma db pull",
     "prisma:migrate:dev": "prisma migrate dev",
     "prisma:migrate:deploy": "prisma migrate deploy",
-    "prisma:migrate:reset": "prisma migrate reset"
+    "prisma:migrate:reset": "prisma migrate reset",
+    "db:backup": "./backup-db.sh",
+    "db:backup:compress": "./backup-db.sh --compress"
   },
   "keywords": [],
   "author": "",

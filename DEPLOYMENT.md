@@ -307,6 +307,22 @@ EMAIL_FROM=noreply@yourdomain.com
 
 ### Backup Database
 
+**Recommended Method**: Use the included backup script for automated, timestamp-based backups:
+
+```bash
+# Quick backup using npm
+npm run db:backup
+
+# Compressed backup
+npm run db:backup:compress
+
+# Advanced options
+./backup-db.sh --compress --output /path/to/backups
+./backup-db.sh --help  # See all options
+```
+
+**Manual Backup** (alternative method):
+
 ```bash
 # Using Docker
 docker-compose exec postgres pg_dump -U postgres hasura > backup.sql
@@ -315,11 +331,24 @@ docker-compose exec postgres pg_dump -U postgres hasura > backup.sql
 pg_dump -h localhost -U postgres -d hasura > backup.sql
 ```
 
+The backup script provides:
+- Automatic timestamp-based filenames
+- Compression support
+- Both Docker and direct connection modes
+- Custom backup directories
+- Automatic restore instructions
+- Error handling and validation
+
+See the [README.md](README.md#database-backups) for complete backup documentation.
+
 ### Restore Database
 
 ```bash
-# Using Docker
+# Using Docker (uncompressed)
 docker-compose exec -T postgres psql -U postgres hasura < backup.sql
+
+# Using Docker (compressed)
+gunzip -c backup.sql.gz | docker-compose exec -T postgres psql -U postgres hasura
 
 # Direct connection
 psql -h localhost -U postgres -d hasura < backup.sql

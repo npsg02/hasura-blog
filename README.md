@@ -284,6 +284,8 @@ Redux Toolkit is configured with two slices:
 - `npm run start` - Start production server
 - `npm run lint` - Run ESLint
 - `npm run codegen` - Generate GraphQL types
+- `npm run db:backup` - Create database backup
+- `npm run db:backup:compress` - Create compressed database backup
 
 ## Prisma Commands
 
@@ -364,6 +366,75 @@ Export metadata:
 
 ```bash
 hasura metadata export
+```
+
+## Database Backups
+
+The project includes a comprehensive database backup script (`backup-db.sh`) that supports both Docker and direct PostgreSQL connections.
+
+### Quick Backup
+
+Using npm scripts:
+
+```bash
+# Create a backup using Docker (default)
+npm run db:backup
+
+# Create a compressed backup
+npm run db:backup:compress
+```
+
+### Advanced Usage
+
+```bash
+# Basic backup (Docker)
+./backup-db.sh
+
+# Backup with compression
+./backup-db.sh --compress
+
+# Backup to custom directory
+./backup-db.sh --output /path/to/backups
+
+# Backup using direct connection
+./backup-db.sh --no-docker --host localhost --port 5432
+
+# Backup specific database
+./backup-db.sh --database mydb --user myuser
+
+# Show all options
+./backup-db.sh --help
+```
+
+### Backup Features
+
+- **Timestamp-based filenames** for easy organization
+- **Compression support** with gzip
+- **Docker and direct connection modes**
+- **Custom backup directories**
+- **Automatic backup directory creation**
+- **Restore instructions** after backup
+- **Error handling and validation**
+
+### Restoring a Backup
+
+After creating a backup, the script provides restore instructions. For example:
+
+```bash
+# Restore uncompressed backup (Docker)
+docker-compose exec -T postgres psql -U postgres -d hasura < backups/hasura_backup_20231110_120000.sql
+
+# Restore compressed backup (Docker)
+gunzip -c backups/hasura_backup_20231110_120000.sql.gz | docker-compose exec -T postgres psql -U postgres -d hasura
+```
+
+### Automated Backups
+
+For production environments, consider setting up automated backups using cron:
+
+```bash
+# Add to crontab (run daily at 2 AM)
+0 2 * * * cd /path/to/hasura-blog && ./backup-db.sh --compress --output /backups/daily
 ```
 
 ## Production Deployment
