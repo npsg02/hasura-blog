@@ -7,6 +7,10 @@ This guide covers different deployment scenarios for the Hasura Blog application
 1. [Local Development](#local-development)
 2. [Docker Compose (Production)](#docker-compose-production)
 3. [Cloud Deployment](#cloud-deployment)
+   - [AWS with Terraform (Recommended)](#aws-with-terraform-recommended)
+   - [Vercel + Hasura Cloud](#vercel--hasura-cloud)
+   - [AWS Manual Deployment](#aws-manual-deployment)
+   - [DigitalOcean App Platform](#digitalocean-app-platform)
 4. [Environment Variables](#environment-variables)
 5. [Database Management](#database-management)
 6. [Troubleshooting](#troubleshooting)
@@ -150,6 +154,64 @@ server {
 
 ## Cloud Deployment
 
+### AWS with Terraform (Recommended)
+
+**Automated infrastructure deployment using Terraform**
+
+This is the recommended approach for production deployments. Terraform provides infrastructure as code with version control and reproducibility.
+
+#### Features
+
+- Automated AWS infrastructure provisioning
+- ECS Fargate for container orchestration
+- RDS PostgreSQL managed database
+- Application Load Balancer with health checks
+- Auto-scaling capabilities
+- CloudWatch logging
+- Multi-AZ deployment for high availability
+
+#### Quick Start
+
+```bash
+# Navigate to terraform directory
+cd terraform
+
+# Copy example variables
+cp terraform.tfvars.example terraform.tfvars
+
+# Set sensitive variables via environment
+export TF_VAR_db_password="your-strong-password"
+export TF_VAR_hasura_admin_secret="your-admin-secret"
+export TF_VAR_jwt_secret="your-jwt-secret-min-32-chars"
+export TF_VAR_nextauth_secret="your-nextauth-secret"
+
+# Initialize Terraform
+terraform init
+
+# Plan deployment
+terraform plan
+
+# Deploy infrastructure
+terraform apply
+```
+
+#### After Deployment
+
+1. Get the ALB DNS name from Terraform outputs:
+   ```bash
+   terraform output nextjs_url
+   terraform output hasura_graphql_url
+   ```
+
+2. Apply database migrations:
+   ```bash
+   cd hasura
+   hasura migrate apply --endpoint http://<alb-dns-name>:8080 --admin-secret <your-secret>
+   hasura metadata apply --endpoint http://<alb-dns-name>:8080 --admin-secret <your-secret>
+   ```
+
+**For detailed instructions, see [terraform/README.md](terraform/README.md)**
+
 ### Vercel + Hasura Cloud
 
 **Next.js on Vercel**:
@@ -173,9 +235,9 @@ cd hasura
 hasura migrate apply --endpoint https://your-project.hasura.app --admin-secret your-secret
 ```
 
-### AWS Deployment
+### AWS Manual Deployment
 
-**Using ECS/Fargate**:
+**Using ECS/Fargate (Manual Setup)**:
 
 1. Create ECR repositories for your images
 2. Build and push Docker images:

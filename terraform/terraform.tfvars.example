@@ -1,0 +1,36 @@
+# AWS Configuration
+aws_region = "us-east-1"
+environment = "prod"
+project_name = "hasura-blog"
+
+# Networking
+vpc_cidr = "10.0.0.0/16"
+availability_zones = ["us-east-1a", "us-east-1b"]
+
+# Database Configuration
+db_name = "hasura"
+db_username = "postgres"
+# db_password should be set via environment variable: TF_VAR_db_password
+db_instance_class = "db.t3.micro"
+allocated_storage = 20
+backup_retention_period = 7
+
+# Hasura Configuration
+# hasura_admin_secret should be set via environment variable: TF_VAR_hasura_admin_secret
+# jwt_secret should be set via environment variable: TF_VAR_jwt_secret (min 32 characters)
+hasura_image = "hasura/graphql-engine:v2.43.0"
+hasura_cpu = 512
+hasura_memory = 1024
+hasura_desired_count = 2
+
+# Next.js Configuration
+# nextjs_image should be set to your ECR repository URL, e.g., "123456789012.dkr.ecr.us-east-1.amazonaws.com/hasura-blog-nextjs:latest"
+nextjs_image = "" # Set this to your ECR image URL
+nextjs_cpu = 512
+nextjs_memory = 1024
+nextjs_desired_count = 2
+
+# NextAuth Configuration
+# nextauth_secret should be set via environment variable: TF_VAR_nextauth_secret
+# nextauth_url should be set to your application URL (e.g., https://yourdomain.com)
+nextauth_url = "http://your-alb-dns-name.amazonaws.com"
