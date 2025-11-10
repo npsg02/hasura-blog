@@ -1,6 +1,6 @@
 terraform {
   required_version = ">= 1.0"
-  
+
   required_providers {
     aws = {
       source  = "hashicorp/aws"
@@ -54,15 +54,15 @@ module "security" {
 module "rds" {
   source = "./modules/rds"
 
-  project_name           = var.project_name
-  environment            = var.environment
-  db_name                = var.db_name
-  db_username            = var.db_username
-  db_password            = var.db_password
-  db_instance_class      = var.db_instance_class
-  allocated_storage      = var.allocated_storage
-  subnet_ids             = module.vpc.private_subnet_ids
-  security_group_ids     = [module.security.rds_security_group_id]
+  project_name            = var.project_name
+  environment             = var.environment
+  db_name                 = var.db_name
+  db_username             = var.db_username
+  db_password             = var.db_password
+  db_instance_class       = var.db_instance_class
+  allocated_storage       = var.allocated_storage
+  subnet_ids              = module.vpc.private_subnet_ids
+  security_group_ids      = [module.security.rds_security_group_id]
   backup_retention_period = var.backup_retention_period
 }
 
@@ -88,18 +88,18 @@ module "ecs" {
   alb_target_group_arn    = module.alb.nextjs_target_group_arn
   hasura_target_group_arn = module.alb.hasura_target_group_arn
   security_group_ids      = [module.security.ecs_security_group_id]
-  
+
   # Database configuration
   database_url = "postgres://${var.db_username}:${var.db_password}@${module.rds.db_endpoint}/${var.db_name}"
-  
+
   # Hasura configuration
-  hasura_admin_secret   = var.hasura_admin_secret
-  jwt_secret            = var.jwt_secret
-  hasura_image          = var.hasura_image
-  hasura_cpu            = var.hasura_cpu
-  hasura_memory         = var.hasura_memory
-  hasura_desired_count  = var.hasura_desired_count
-  
+  hasura_admin_secret  = var.hasura_admin_secret
+  jwt_secret           = var.jwt_secret
+  hasura_image         = var.hasura_image
+  hasura_cpu           = var.hasura_cpu
+  hasura_memory        = var.hasura_memory
+  hasura_desired_count = var.hasura_desired_count
+
   # Next.js configuration
   nextjs_image         = var.nextjs_image
   nextjs_cpu           = var.nextjs_cpu
