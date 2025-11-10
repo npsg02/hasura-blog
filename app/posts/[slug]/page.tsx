@@ -6,8 +6,10 @@ import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import CategoryBadge from '@/components/blog/CategoryBadge';
 import CommentList from '@/components/blog/CommentList';
+import RelatedPosts from '@/components/blog/RelatedPosts';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import ErrorMessage from '@/components/ui/ErrorMessage';
+import BackToTop from '@/components/ui/BackToTop';
 
 const GET_POST_BY_SLUG = gql`
   query GetPostBySlug($slug: String!) {
@@ -54,6 +56,37 @@ const GET_POST_BY_SLUG = gql`
   }
 `;
 
+const GET_RELATED_POSTS = gql`
+  query GetRelatedPosts($categorySlug: String!, $currentSlug: String!) {
+    posts(
+      where: {
+        category: { slug: { _eq: $categorySlug } }
+        slug: { _neq: $currentSlug }
+        status: { _eq: "published" }
+      }
+      limit: 3
+      order_by: { published_at: desc }
+    ) {
+      id
+      title
+      slug
+      excerpt
+      featured_image
+      published_at
+      author {
+        id
+        name
+        avatar_url
+      }
+      category {
+        id
+        name
+        slug
+      }
+    }
+  }
+`;
+
 export default function PostPage() {
   const params = useParams();
   const slug = params.slug as string;
@@ -62,10 +95,20 @@ export default function PostPage() {
     variables: { slug },
   });
 
+  const post = (data as any)?.posts?.[0];
+  
+  const { data: relatedData } = useQuery(GET_RELATED_POSTS, {
+    variables: { 
+      categorySlug: post?.category?.slug || '',
+      currentSlug: slug 
+    },
+    skip: !post?.category?.slug,
+  });
+
   if (loading) return <LoadingSpinner />;
   if (error) return <ErrorMessage message="Failed to load post. Please try again later." />;
 
-  const post = (data as any)?.posts?.[0];
+  const relatedPosts = (relatedData as any)?.posts || [];
 
   if (!post) {
     return (
@@ -193,6 +236,13 @@ export default function PostPage() {
           <CommentList comments={post.comments} />
         </div>
       </article>
+
+      {/* Related Posts */}
+      {relatedPosts.length > 0 && (
+        <RelatedPosts posts={relatedPosts} />
+      )}
+      
+      <BackToTop />
     </main>
   );
 }
