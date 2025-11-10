@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { ApolloWrapper } from "@/lib/apollo-provider";
 import { ReduxProvider } from "@/lib/redux/provider";
+import Header from "@/components/ui/Header";
 
 export const metadata: Metadata = {
   title: "Hasura Blog",
@@ -25,6 +26,7 @@ export default function RootLayout({
       <body className="antialiased">
         <ReduxProvider>
           <ApolloWrapper>
+            <Header />
             {children}
           </ApolloWrapper>
         </ReduxProvider>
