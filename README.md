@@ -368,7 +368,30 @@ hasura metadata export
 
 ## Production Deployment
 
-### Build the production image
+### Option 1: AWS with Terraform (Recommended)
+
+Deploy to AWS with automated infrastructure provisioning using Terraform:
+
+```bash
+cd terraform
+cp terraform.tfvars.example terraform.tfvars
+# Edit terraform.tfvars with your configuration
+
+# Set sensitive variables
+export TF_VAR_db_password="your-password"
+export TF_VAR_hasura_admin_secret="your-secret"
+export TF_VAR_jwt_secret="your-jwt-secret"
+export TF_VAR_nextauth_secret="your-nextauth-secret"
+
+# Deploy
+./deploy.sh
+```
+
+For detailed instructions, see [terraform/README.md](terraform/README.md) and [terraform/ARCHITECTURE.md](terraform/ARCHITECTURE.md).
+
+### Option 2: Docker Compose
+
+Build the production image:
 
 ```bash
 docker-compose -f docker-compose.yml build
